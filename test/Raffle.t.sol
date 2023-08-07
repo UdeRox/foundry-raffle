@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import "../src/Raffle.sol";
+
 // import {MockVRFConsumnerBaseV2} from './mock/MockVRFConsumerBaseV2.sol';
 
 contract RaffleTest is Test {
@@ -20,7 +21,7 @@ contract RaffleTest is Test {
     //     uint16 _minBlockConfirmation,
     //     uint64 _subId,
     //     uint32 _callbackGasLimit
-    // ) 
+    // )
     function setUp() public {
         vm.prank(address(0));
         // raffle = new Raffle(ENTRANCE_FEE, INTERVAL,address(0),3,2,5,20000);
