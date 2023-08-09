@@ -9,6 +9,9 @@ import {DeployRaffle} from "../../script/DeployRaffle.s.sol";
 // import {MockVRFConsumnerBaseV2} from './mock/MockVRFConsumerBaseV2.sol';
 
 contract RaffleTest is Test {
+    /**Events */
+    event EnteredRaffle(address indexed player);
+
     uint256 constant ENTRANCE_FEE = 0.1 ether;
     uint256 public constant PLAYER_BALNCE = 10 ether;
     uint256 constant INTERVAL = 60;
@@ -25,10 +28,12 @@ contract RaffleTest is Test {
     //     uint64 _subId,
     //     uint32 _callbackGasLimit
     // )
+
     function setUp() public {
         // HelperConfig  helperConfig = new HelperConfig();
         DeployRaffle deployRaffle = new DeployRaffle();
         (raffle, helperConfig) = deployRaffle.run();
+        // () = helperConfig.getSepoliaEthConfig();
         // vm.prank(address(0));
         // raffle = new Raffle(ENTRANCE_FEE, INTERVAL,address(0),3,2,5,20000);
         // raffle = new Raffle(ENTRANCE_FEE, INTERVAL);
@@ -59,5 +64,15 @@ contract RaffleTest is Test {
         vm.expectRevert(Raffle.Raffle__NotEnoughETHSend.selector);
         raffle.enterRaffle{value: 0.09 ether}();
         // revert(raffle.getPlayers().length == 0);
+    }
+
+    function testPlayerHasEnoguhETHRaffleIsClosed() public {}
+
+    function testEmitEvents() public {
+        vm.prank(PLAYER);
+        vm.deal(PLAYER, PLAYER_BALNCE);
+        vm.expectEmit(true, false, false, false, address(raffle));
+        emit EnteredRaffle(PLAYER);
+        raffle.enterRaffle{value: 0.9 ether}();
     }
 }
