@@ -130,4 +130,12 @@ contract Raffle is VRFConsumerBaseV2 {
     function getEnteranceFee() external view returns (uint256) {
         return i_entranceFee;
     }
+
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getPlayers() public view returns (address payable[] memory) {
+        return s_players;
+    }
 }
