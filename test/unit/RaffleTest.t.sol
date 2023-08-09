@@ -19,24 +19,25 @@ contract RaffleTest is Test {
     Raffle raffle;
     HelperConfig helperConfig;
 
-    // constructor(
-    //     uint256 _i_entranceFee,
-    //     uint256 _interval,
-    //     address _vrfCoordinator,
-    //     bytes32 _gasLane,
-    //     uint16 _minBlockConfirmation,
-    //     uint64 _subId,
-    //     uint32 _callbackGasLimit
-    // )
+    uint256 entranceFee;
+    uint256 interval;
+    address vrfCoordinator;
+    bytes32 gasLane;
+    uint64 subscriptionId;
+    uint32 callBackGasLimit;
 
     function setUp() public {
-        // HelperConfig  helperConfig = new HelperConfig();
         DeployRaffle deployRaffle = new DeployRaffle();
         (raffle, helperConfig) = deployRaffle.run();
-        // () = helperConfig.getSepoliaEthConfig();
-        // vm.prank(address(0));
-        // raffle = new Raffle(ENTRANCE_FEE, INTERVAL,address(0),3,2,5,20000);
-        // raffle = new Raffle(ENTRANCE_FEE, INTERVAL);
+
+        (
+            entranceFee,
+            interval,
+            vrfCoordinator,
+            gasLane,
+            subscriptionId,
+            callBackGasLimit
+        ) = helperConfig.activeNetworkConfig();
     }
 
     // function testEnteranceFree() public {
@@ -68,11 +69,27 @@ contract RaffleTest is Test {
 
     function testPlayerHasEnoguhETHRaffleIsClosed() public {}
 
-    function testEmitEvents() public {
+    function testEmitEventOnEntrance() public {
         vm.prank(PLAYER);
         vm.deal(PLAYER, PLAYER_BALNCE);
         vm.expectEmit(true, false, false, false, address(raffle));
         emit EnteredRaffle(PLAYER);
         raffle.enterRaffle{value: 0.9 ether}();
+    }
+
+    function testCantEnterWhenCalculating() public {
+        vm.prank(PLAYER);
+        vm.deal(PLAYER, PLAYER_BALNCE);
+        raffle.enterRaffle{value: 0.2 ether}();
+        vm.warp(block.timestamp + interval +1);
+        vm.roll(block.number + 1);
+        raffle.peformUpKey("");
+
+        // vm.expectRevert(Raffle.Raffle__NotOpened.selector);
+        raffle.enterRaffle{value:entranceFee}();
+        vm.prank(PLAYER);
+        vm.deal(PLAYER, PLAYER_BALNCE);
+        vm.expectRevert();
+
     }
 }
